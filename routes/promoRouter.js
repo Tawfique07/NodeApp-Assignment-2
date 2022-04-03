@@ -9,23 +9,53 @@
 //External imports
 const express = require("express");
 
+//Model Import
+const Promotion = require("../models/promotions");
+
 //Initializing express Router Object
 const promoRouter = express.Router();
 
 //Get Router
-promoRouter.get("/", (req, res) => {
-  res.send(`Will Send All the promotions`);
+promoRouter.get("/", async (req, res) => {
+  try {
+    const promotions = await Promotion.find({});
+    res.status(200).json(promotions);
+  } catch (err) {
+    res.status(500).json({
+      error: {
+        message: "There is a server Error",
+      },
+    });
+  }
 });
 
-promoRouter.get("/:promoId", (req, res) => {
-  res.send(`will send promotion of id : ${req.params.promoId}`);
+promoRouter.get("/:promoId", async (req, res) => {
+  try {
+    const promotion = await Promotion.findById(req.params.promoId);
+    res.status(200).json(promotion);
+  } catch (err) {
+    res.status(500).json({
+      message: "Could not find the promo",
+    });
+  }
 });
 
 //post Router
-promoRouter.post("/", (req, res) => {
-  res.send(
-    `This will add promotion: ${req.body.name} with details : ${req.body.description}`
-  );
+promoRouter.post("/", async (req, res) => {
+  const promotion = new Promotion(req.body);
+  try {
+    const result = await promotion.save();
+
+    res.status(200).json({
+      message: "promotion was added successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      error: {
+        msg: "Could not add promotion...",
+      },
+    });
+  }
 });
 
 promoRouter.post("/:promoId", (req, res) => {
@@ -35,11 +65,15 @@ promoRouter.post("/:promoId", (req, res) => {
 });
 
 //put Router
-promoRouter.put("/:promoId", (req, res) => {
-  res.write(`Updating the promotion: ${req.params.promoId} \n`);
-  res.end(
-    `will Update the promotion: ${req.body.name} with details: ${req.body.description}`
-  );
+promoRouter.put("/:promoId", async (req, res) => {
+  try {
+    const result = await Promotion.findByIdAndUpdate(req.params.promoId, {
+      $set: req.body,
+    });
+    res.status(200).json({ message: "Updated successfully" });
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 promoRouter.put("/", (req, res) => {
@@ -47,12 +81,22 @@ promoRouter.put("/", (req, res) => {
 });
 
 //Delete Router
-promoRouter.delete("/", (req, res) => {
-  res.send(`will delete all promotions`);
+promoRouter.delete("/", async (req, res) => {
+  try {
+    const result = await Promotion.remove({});
+    res.status.json(result);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
-promoRouter.delete("/:promoId", (req, res) => {
-  res.send(`will delete the promotion of Id: ${req.params.promoId}`);
+promoRouter.delete("/:promoId", async (req, res) => {
+  try {
+    const result = await Promotion.findByIdAndRemove(req.params.promoId);
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 //Export Promo Router
