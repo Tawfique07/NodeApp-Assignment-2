@@ -8,11 +8,24 @@
 
 //External Imports
 const express = require("express");
+const mongoose = require("mongoose");
 
 //Router Imports
 const dishRouter = require("./routes/dishRouter");
 const promoRouter = require("./routes/promoRouter");
 const leaderRouter = require("./routes/leaderRouter");
+
+//Creating connection With MongoDB
+const MONGO_STRING = "mongodb://0.0.0.0:27017/nodeApp";
+mongoose
+  .connect(MONGO_STRING)
+  .then(() => {
+    console.log("Connection With Mongo has been established...");
+  })
+  .catch((err) => {
+    console.log("There is an Error");
+    console.log(err);
+  });
 
 //creating express app
 const app = express();
